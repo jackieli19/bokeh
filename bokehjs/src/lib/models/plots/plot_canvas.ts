@@ -585,7 +585,6 @@ export class PlotView extends LayoutDOMView {
     if (do_primary) {
       primary.prepare()
       this.canvas_view.prepare_webgl(frame_box)
-      this.canvas_view.clear_webgl()
 
       this._map_hook(primary.ctx, frame_box)
       this._paint_empty(primary.ctx, frame_box)
@@ -631,7 +630,6 @@ export class PlotView extends LayoutDOMView {
 
       if (renderer_view.has_webgl && renderer_view.needs_webgl_blit) {
         this.canvas_view.blit_webgl(ctx)
-        this.canvas_view.clear_webgl()
       }
     }
   }
