@@ -12,7 +12,7 @@ import {
   Plot,
 } from "@bokehjs/models"
 
-import {MultiChoice, MultiSelect} from "@bokehjs/models/widgets"
+import {Select, MultiSelect, MultiChoice} from "@bokehjs/models/widgets"
 
 import {Factor} from "@bokehjs/models/ranges/factor_range"
 
@@ -587,6 +587,22 @@ describe("Bug", () => {
       })
       const {view} = await display(box, [600, 300])
       box.cols = {0: 100, 1: 500}
+      await view.ready
+    })
+  })
+
+  describe("in issue #10407", () => {
+    it("displays incorrect value in Select widget when options change", async () => {
+      const widget = new Select({options: ["1", "2", "3"], value: "2", width: 200})
+      const {view} = await display(widget, [250, 100])
+      widget.options = ["1", "2"]
+      await view.ready
+    })
+
+    it("displays out-of-range value in Select widget when options change", async () => {
+      const widget = new Select({options: ["1", "2", "3"], value: "3", width: 200})
+      const {view} = await display(widget, [250, 100])
+      widget.options = ["1", "2"]
       await view.ready
     })
   })
