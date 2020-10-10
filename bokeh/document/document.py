@@ -44,6 +44,7 @@ import jinja2
 
 # Bokeh imports
 from ..core.enums import HoldPolicy
+from ..core.has_props import is_DataModel
 from ..core.json_encoder import serialize_json
 from ..core.query import find
 from ..core.templates import FILE
@@ -916,15 +917,36 @@ class Document:
         for r in self._roots:
             root_ids.append(r.id)
 
+        class StaticSerializer:
+
+            def __init__(self):
+                self._visited = set()
+                self._defs = []
+
+            def add_ref(self, obj, _obj_ref, obj_def):
+                if obj not in self._visited:
+                    self._defs.append(obj_def)
+                    self._visited.add(obj)
+
+            @property
+            def definitions(self):
+                return list(self._defs)
+
+        serializer = StaticSerializer()
+        for model in Model.model_class_reverse_map.values():
+            if is_DataModel(model):
+                model.static_to_serializable(serializer)
+
         root_references = self._all_models.values()
 
         json = {
             'title' : self.title,
+            'defs' : serializer.definitions,
             'roots' : {
                 'root_ids' : root_ids,
                 'references' : references_json(root_references)
             },
-            'version' : __version__
+            'version' : __version__,
         }
 
         return serialize_json(json, indent=indent)
